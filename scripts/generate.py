@@ -8,7 +8,6 @@ TAIPEI = ZoneInfo("Asia/Taipei")
 
 
 def fetch_calendar_events(ical_url: str, today: datetime.date) -> list[dict]:
-    """Fetch and parse today's events from a Google Calendar iCal URL."""
     try:
         with urllib.request.urlopen(ical_url, timeout=10) as resp:
             raw = resp.read().decode("utf-8")
@@ -31,7 +30,6 @@ def fetch_calendar_events(ical_url: str, today: datetime.date) -> list[dict]:
             if start:
                 try:
                     if "T" in start:
-                        # datetime event
                         dt = datetime.datetime.strptime(start[:15], "%Y%m%dT%H%M%S")
                         event_date = dt.date()
                         time_str = dt.strftime("%H:%M")
@@ -55,7 +53,6 @@ def fetch_calendar_events(ical_url: str, today: datetime.date) -> list[dict]:
 
 
 def get_quote(client: anthropic.Anthropic) -> str:
-    """Use Claude to generate a motivational quote."""
     message = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=300,
@@ -82,18 +79,24 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
             f'<li><span class="time">{e["time"]}</span><span class="title">{e["summary"]}</span></li>'
             for e in events
         )
-        content_html = f"""
+        schedule_html = f"""
         <div class="section">
           <h2>📅 今日行程</h2>
           <ul class="events">{items_html}</ul>
         </div>"""
     else:
-        quote_html = quote.replace("\n", "<br>") if quote else "今日靜心，明日前行。"
-        content_html = f"""
+        schedule_html = """
+        <div class="section free-section">
+          <h2>📅 今日行程</h2>
+          <p class="free-text">今日你很 Free 喔～</p>
+        </div>"""
+
+    quote_html = quote.replace("\n", "<br>") if quote else ""
+    quote_block = f"""
         <div class="section quote-section">
           <h2>✨ 今日金句</h2>
           <blockquote>{quote_html}</blockquote>
-        </div>"""
+        </div>""" if quote_html else ""
 
     return f"""<!DOCTYPE html>
 <html lang="zh-Hant">
@@ -105,8 +108,8 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
       font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
-      background: #0f0f14;
-      color: #e8e0f0;
+      background: #f0ede8;
+      color: #3d3530;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -114,67 +117,81 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
       padding: 2rem 1rem;
     }}
     .card {{
-      background: #1a1a2e;
-      border: 1px solid #2e2e4a;
-      border-radius: 20px;
+      background: #fdfaf7;
+      border: 1px solid #e8ddd5;
+      border-radius: 24px;
       padding: 2.5rem 2rem;
       max-width: 600px;
       width: 100%;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 24px rgba(180,150,140,0.12);
     }}
     .header {{ margin-bottom: 2rem; text-align: center; }}
     .header .name {{
-      font-size: 0.85rem;
-      color: #a78bfa;
-      letter-spacing: 0.15em;
+      font-size: 0.8rem;
+      color: #b08a8a;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
     }}
     .header .date {{
       font-size: 1.6rem;
       font-weight: 700;
-      color: #f3eeff;
+      color: #3d3530;
     }}
     .header .weekday {{
       font-size: 0.9rem;
-      color: #6b6b8a;
-      margin-top: 0.2rem;
+      color: #a89585;
+      margin-top: 0.25rem;
     }}
+    .divider {{
+      border: none;
+      border-top: 1px solid #edd5d0;
+      margin: 1.5rem 0;
+    }}
+    .section {{ margin-bottom: 1.5rem; }}
+    .section:last-of-type {{ margin-bottom: 0; }}
     .section h2 {{
-      font-size: 1rem;
-      color: #a78bfa;
-      margin-bottom: 1.2rem;
-      letter-spacing: 0.05em;
+      font-size: 0.85rem;
+      color: #9dbaA0;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
     }}
     .events {{ list-style: none; }}
     .events li {{
       display: flex;
       gap: 1rem;
       align-items: flex-start;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid #2a2a3e;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #f0e5e0;
     }}
     .events li:last-child {{ border-bottom: none; }}
     .time {{
-      font-size: 0.8rem;
-      color: #a78bfa;
+      font-size: 0.78rem;
+      color: #c4938a;
       min-width: 42px;
       padding-top: 2px;
       font-variant-numeric: tabular-nums;
     }}
-    .title {{ font-size: 1rem; line-height: 1.5; color: #e8e0f0; }}
+    .title {{ font-size: 0.95rem; line-height: 1.6; color: #3d3530; }}
+    .free-text {{
+      font-size: 1.05rem;
+      color: #c4938a;
+      font-weight: 500;
+      padding: 0.5rem 0;
+    }}
     .quote-section blockquote {{
-      font-size: 1rem;
+      font-size: 0.93rem;
       line-height: 1.9;
-      color: #d0c8e8;
-      border-left: 3px solid #a78bfa;
+      color: #6b5a55;
+      border-left: 3px solid #d4a8b0;
       padding-left: 1.2rem;
     }}
     .footer {{
       margin-top: 2rem;
       text-align: center;
-      font-size: 0.75rem;
-      color: #3a3a5a;
+      font-size: 0.72rem;
+      color: #c8bab5;
     }}
   </style>
 </head>
@@ -185,7 +202,10 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
       <div class="date">{date_str}</div>
       <div class="weekday">星期{weekday}</div>
     </div>
-    {content_html}
+    <hr class="divider">
+    {schedule_html}
+    <hr class="divider">
+    {quote_block}
     <div class="footer">每日 09:00 台北時間自動更新</div>
   </div>
 </body>
@@ -202,7 +222,7 @@ def main():
     events = fetch_calendar_events(ical_url, today) if ical_url else []
 
     quote = None
-    if not events and api_key:
+    if api_key:
         client = anthropic.Anthropic(api_key=api_key)
         quote = get_quote(client)
 
