@@ -125,10 +125,20 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
       width: 100%;
       box-shadow: 0 4px 24px rgba(180,150,140,0.12);
     }}
-    .header {{ margin-bottom: 2rem; text-align: center; }}
+    .header {{
+      margin-bottom: 2rem;
+      text-align: center;
+    }}
+    .header-block {{
+      background: rgba(220, 180, 180, 0.8);
+      border-radius: 16px;
+      padding: 1.4rem 2rem;
+      display: inline-block;
+      min-width: 260px;
+    }}
     .header .name {{
-      font-size: 0.8rem;
-      color: #b08a8a;
+      font-size: 0.78rem;
+      color: #8a6060;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       margin-bottom: 0.5rem;
@@ -136,11 +146,11 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
     .header .date {{
       font-size: 1.6rem;
       font-weight: 700;
-      color: #3d3530;
+      color: #3d2e2e;
     }}
     .header .weekday {{
       font-size: 0.9rem;
-      color: #a89585;
+      color: #9a7070;
       margin-top: 0.25rem;
     }}
     .divider {{
@@ -198,9 +208,11 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
 <body>
   <div class="card">
     <div class="header">
-      <div class="name">Bella's LifeOS</div>
-      <div class="date">{date_str}</div>
-      <div class="weekday">星期{weekday}</div>
+      <div class="header-block">
+        <div class="name">Bella's LifeOS</div>
+        <div class="date">{date_str}</div>
+        <div class="weekday">星期{weekday}</div>
+      </div>
     </div>
     <hr class="divider">
     {schedule_html}
