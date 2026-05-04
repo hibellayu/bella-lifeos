@@ -2,7 +2,7 @@ name: Daily Dashboard
 
 on:
   schedule:
-    - cron: "0 1 * * *"  # 每天 09:00 台北時間（UTC+8 = UTC 01:00）
+    - cron: "0 * * * *"  # 每小時整點執行
   workflow_dispatch:       # 允許手動觸發
 
 permissions:
