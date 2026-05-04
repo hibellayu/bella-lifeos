@@ -126,15 +126,11 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
       box-shadow: 0 4px 24px rgba(180,150,140,0.12);
     }}
     .header {{
-      margin-bottom: 2rem;
-      text-align: center;
-    }}
-    .header-block {{
       background: rgba(220, 180, 180, 0.8);
-      border-radius: 16px;
-      padding: 1.4rem 2rem;
-      display: inline-block;
-      min-width: 260px;
+      border-radius: 20px 20px 0 0;
+      margin: -2.5rem -2rem 2rem -2rem;
+      padding: 2rem 2rem;
+      text-align: center;
     }}
     .header .name {{
       font-size: 0.78rem;
@@ -208,11 +204,9 @@ def generate_html(today: datetime.date, events: list[dict], quote: str | None) -
 <body>
   <div class="card">
     <div class="header">
-      <div class="header-block">
-        <div class="name">Bella's LifeOS</div>
-        <div class="date">{date_str}</div>
-        <div class="weekday">星期{weekday}</div>
-      </div>
+      <div class="name">Bella's LifeOS</div>
+      <div class="date">{date_str}</div>
+      <div class="weekday">星期{weekday}</div>
     </div>
     <hr class="divider">
     {schedule_html}
