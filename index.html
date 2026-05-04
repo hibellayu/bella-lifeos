@@ -58,7 +58,7 @@
     .section:last-of-type { margin-bottom: 0; }
     .section h2 {
       font-size: 0.85rem;
-      color: #9dbaA0;
+      color: #9dbaa0;
       letter-spacing: 0.08em;
       margin-bottom: 1rem;
       text-transform: uppercase;
@@ -87,11 +87,32 @@
       padding: 0.5rem 0;
     }
     .quote-section blockquote {
-      font-size: 0.93rem;
-      line-height: 1.9;
-      color: #6b5a55;
       border-left: 3px solid #d4a8b0;
       padding-left: 1.2rem;
+    }
+    .quote-text {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #3d3530;
+      font-style: italic;
+    }
+    .quote-zh {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #6b5a55;
+      margin-top: 0.5rem;
+    }
+    .quote-source {
+      font-size: 0.75rem;
+      color: #b09a95;
+      margin-top: 0.6rem;
+      letter-spacing: 0.03em;
+    }
+    .quote-reflection {
+      font-size: 0.85rem;
+      color: #8a7570;
+      margin-top: 0.8rem;
+      line-height: 1.6;
     }
     .footer {
       margin-top: 2rem;
@@ -112,15 +133,20 @@
     
         <div class="section">
           <h2>📅 今日行程</h2>
-          <ul class="events"><li><span class="time">全天</span><span class="title">天赦日</span></li><li><span class="time">全天</span><span class="title">陽明山健走</span></li></ul>
+          <ul class="events"><li><span class="time">全天</span><span class="title">陽明山健走</span></li><li><span class="time">全天</span><span class="title">天赦日</span></li></ul>
         </div>
     <hr class="divider">
     
         <div class="section quote-section">
           <h2>✨ 今日金句</h2>
-          <blockquote>人生不是尋找自己，而是創造自己。<br><br>── 喬治·蕭伯納<br><br>🍺 我們的人生由選擇塑造，而非命運決定。勇敢創造，而非被動尋找。</blockquote>
+          <blockquote>
+            <p class="quote-text">The present moment is the only moment available to us, and it is the door to all moments.</p>
+            <p class="quote-zh">當下這一刻是我們唯一擁有的，也是通往一切時刻的門。</p>
+            <p class="quote-source">── 一行禪師《正念的奇蹟》The Miracle of Mindfulness</p>
+            <p class="quote-reflection">🍺 與其擔心未來或懊悔過去，不如好好感受當下的呼吸，那才是真正能改變生活的力量。</p>
+          </blockquote>
         </div>
-    <div class="footer">每日 09:00 台北時間自動更新</div>
+    <div class="footer">每小時自動更新</div>
   </div>
 </body>
 </html>
