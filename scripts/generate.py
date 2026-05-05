@@ -188,7 +188,11 @@ def fetch_calendar_events(ical_url: str, today: datetime.date) -> list[dict]:
             if start:
                 try:
                     if "T" in start:
-                        dt = datetime.datetime.strptime(start[:15], "%Y%m%dT%H%M%S")
+                        if start.endswith("Z"):
+                            dt = datetime.datetime.strptime(start[:15], "%Y%m%dT%H%M%S")
+                            dt = dt.replace(tzinfo=datetime.timezone.utc).astimezone(TAIPEI)
+                        else:
+                            dt = datetime.datetime.strptime(start[:15], "%Y%m%dT%H%M%S")
                         event_date = dt.date()
                         time_str = dt.strftime("%H:%M")
                     else:
