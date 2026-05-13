@@ -445,6 +445,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       color: #2C2318;
       line-height: 1.9;
       font-weight: 300;
+      font-style: italic;
     }}
     .footer {{
       padding: 0.85rem 2.5rem;
