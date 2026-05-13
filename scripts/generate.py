@@ -171,12 +171,13 @@ def get_daily_quote(today: datetime.date, api_key: str) -> dict:
     quote = random.choice(QUOTES)
 
     reflection = ""
+    question = ""
     if api_key:
+        client = anthropic.Anthropic(api_key=api_key)
+        text = quote["text"]
+        source = quote["source"]
         try:
-            client = anthropic.Anthropic(api_key=api_key)
-            text = quote["text"]
-            source = quote["source"]
-            message = client.messages.create(
+            msg = client.messages.create(
                 model="claude-haiku-4-5-20251001",
                 max_tokens=120,
                 messages=[{
@@ -188,11 +189,27 @@ def get_daily_quote(today: datetime.date, api_key: str) -> dict:
                     ),
                 }],
             )
-            reflection = message.content[0].text.strip()
+            reflection = msg.content[0].text.strip()
         except Exception as e:
-            print(f"Claude API error: {e}")
+            print(f"Claude API error (reflection): {e}")
+        try:
+            msg = client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=80,
+                messages=[{
+                    "role": "user",
+                    "content": (
+                        f"這句話：「{text}」（出自 {source}）\n"
+                        "請根據這句話，用繁體中文寫一個引導自我探索的問題，30 字以內，"
+                        "語氣溫和像在邀請對話，直接輸出問題（含問號），不要任何前綴。"
+                    ),
+                }],
+            )
+            question = msg.content[0].text.strip()
+        except Exception as e:
+            print(f"Claude API error (question): {e}")
 
-    return {**quote, "reflection": reflection}
+    return {**quote, "reflection": reflection, "question": question}
 
 
 def generate_html(today: datetime.date, events: list[dict], quote: dict,
@@ -217,9 +234,14 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
     q_zh = quote.get("zh") or ""
     q_source = quote["source"]
     q_reflection = quote.get("reflection") or ""
+    q_question = quote.get("question") or ""
 
     zh_line = f'<p class="quote-zh">{q_zh}</p>' if q_zh else ""
     reflection_line = f'<p class="quote-reflection">{q_reflection}</p>' if q_reflection else ""
+    explore_line = (
+        f'<div class="explore-wrap"><div class="explore-label">今日一問</div>'
+        f'<p class="explore-text">{q_question}</p></div>'
+    ) if q_question else ""
 
     lunar_html = ""
     if lunar_date or solar_term:
@@ -404,6 +426,26 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       border-top: 1px dashed #D4C8BC;
       padding-top: 1rem;
     }}
+    .explore-wrap {{
+      margin-top: 1.3rem;
+      padding: 0.85rem 1.1rem;
+      background: #EDE8DC;
+      border-left: 2px solid #8B3A2A;
+      text-align: left;
+    }}
+    .explore-label {{
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      color: #8B3A2A;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      margin-bottom: 0.5rem;
+    }}
+    .explore-text {{
+      font-size: 0.85rem;
+      color: #2C2318;
+      line-height: 1.9;
+      font-weight: 300;
+    }}
     .footer {{
       padding: 0.85rem 2.5rem;
       border-top: 1px solid #BFB0A0;
@@ -443,6 +485,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
         {zh_line}
         <p class="quote-source">── {q_source}</p>
         {reflection_line}
+        {explore_line}
       </div>
     </div>
     <div class="footer">BELLA'S LIFEOS · 每小時自動更新</div>
