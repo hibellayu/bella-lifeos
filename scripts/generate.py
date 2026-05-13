@@ -369,21 +369,8 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       padding: 0.3rem 0;
       font-weight: 300;
     }}
-    .mid-divider {{
-      text-align: center;
-      margin: 1.6rem 0;
-      color: #C4B5A0;
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }}
-    .mid-divider::before,
-    .mid-divider::after {{
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #C4B5A0;
+    .section-gap {{
+      margin-top: 1.6rem;
     }}
     .quote-area {{ text-align: center; }}
     .quote-text {{
@@ -450,8 +437,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
     <div class="body">
       <div class="section-label">今日行程</div>
       {schedule_html}
-      <div class="mid-divider">✦</div>
-      <div class="quote-area">
+      <div class="quote-area section-gap">
         <div class="section-label">今日金句</div>
         <p class="quote-text">{q_text}</p>
         {zh_line}
