@@ -255,7 +255,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bella's LifeOS｜{date_str}</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400;600&display=swap');
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
       font-family: "Noto Serif TC", "Songti TC", "Georgia", serif;
@@ -396,11 +396,12 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
     }}
     .quote-area {{ text-align: center; }}
     .quote-text {{
-      font-size: 0.98rem;
+      font-family: "Lora", "Noto Serif TC", serif;
+      font-size: 0.88rem;
       line-height: 2;
       color: #2C2318;
       font-weight: 400;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.02em;
     }}
     .quote-zh {{
       font-size: 0.83rem;
@@ -443,10 +444,9 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
     .explore-text {{
       font-family: "Noto Sans TC", "PingFang TC", sans-serif;
       font-size: 0.78rem;
-      color: #2D4A2A;
+      color: #3A2510;
       line-height: 1.9;
       font-weight: 300;
-      font-style: italic;
     }}
     .footer {{
       padding: 0.85rem 2.5rem;
