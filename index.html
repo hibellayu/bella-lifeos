@@ -5,148 +5,234 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bella's LifeOS｜2026 年 05 月 13 日</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
-      background: #f0ede8;
-      color: #3d3530;
+      font-family: "Noto Serif TC", "Songti TC", "Georgia", serif;
+      background: #E8E0D5;
+      color: #2C2318;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem 1rem;
     }
-    .card {
-      background: #fdfaf7;
-      border: 1px solid #e8ddd5;
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      max-width: 600px;
+    .page {
+      background: #F7F2EA;
+      max-width: 460px;
       width: 100%;
-      box-shadow: 0 4px 24px rgba(180,150,140,0.12);
+      box-shadow: 0 2px 4px rgba(44,35,24,0.08), 0 12px 40px rgba(44,35,24,0.15);
     }
-    .header {
-      background: rgba(220, 180, 180, 0.8);
-      border-radius: 20px 20px 0 0;
-      margin: -2.5rem -2rem 2rem -2rem;
-      padding: 2rem 2rem;
+    .rings {
+      display: flex;
+      justify-content: center;
+      gap: 2.8rem;
+      padding: 0.7rem 0;
+      background: #D4C8BC;
+      border-bottom: 1px solid #BFB0A0;
+    }
+    .ring {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #F7F2EA;
+      border: 2px solid #A89278;
+      box-shadow: inset 0 1px 3px rgba(44,35,24,0.25);
+    }
+    .cal-header {
+      padding: 2rem 2.5rem 1.5rem;
       text-align: center;
     }
-    .header .name {
-      font-size: 0.78rem;
-      color: #8a6060;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
+    .month-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.45em;
+      color: #8B3A2A;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
     }
-    .header .date {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #3d2e2e;
+    .day-number {
+      font-size: 5.5rem;
+      font-weight: 300;
+      color: #2C2318;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.45rem;
     }
-    .header .weekday {
-      font-size: 0.9rem;
-      color: #9a7070;
-      margin-top: 0.25rem;
+    .weekday-label {
+      font-size: 0.68rem;
+      color: #8A7B68;
+      letter-spacing: 0.25em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      margin-bottom: 0.7rem;
     }
-    .divider {
-      border: none;
-      border-top: 1px solid #edd5d0;
-      margin: 1.5rem 0;
+    .lunar-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
-    .section { margin-bottom: 1.5rem; }
-    .section:last-of-type { margin-bottom: 0; }
-    .section h2 {
-      font-size: 0.85rem;
-      color: #9dbaa0;
+    .lunar-date {
+      font-size: 0.62rem;
+      color: #8A7B68;
       letter-spacing: 0.08em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+    }
+    .solar-badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      color: #F7F2EA;
+      background: #8B3A2A;
+      padding: 0.1rem 0.5rem;
+      letter-spacing: 0.12em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+    }
+    .wave-sep {
+      display: block;
+      width: 100%;
+      height: 10px;
+    }
+    .body {
+      padding: 1.6rem 2.5rem 2rem;
+    }
+    .section-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      color: #8B3A2A;
+      font-family: -apple-system, "PingFang TC", sans-serif;
       margin-bottom: 1rem;
-      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #C4B5A0;
     }
     .events { list-style: none; }
     .events li {
       display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-      padding: 0.7rem 0;
-      border-bottom: 1px solid #f0e5e0;
+      gap: 0.9rem;
+      align-items: baseline;
+      padding: 0.5rem 0;
+      border-bottom: 1px dashed #D4C8BC;
     }
     .events li:last-child { border-bottom: none; }
     .time {
-      font-size: 0.78rem;
-      color: #c4938a;
-      min-width: 42px;
-      padding-top: 2px;
+      font-size: 0.68rem;
+      color: #8B3A2A;
+      min-width: 36px;
       font-variant-numeric: tabular-nums;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      flex-shrink: 0;
     }
-    .title { font-size: 0.95rem; line-height: 1.6; color: #3d3530; }
-    .free-text {
-      font-size: 1.05rem;
-      color: #c4938a;
-      font-weight: 500;
-      padding: 0.5rem 0;
-    }
-    .quote-section blockquote {
-      border-left: 3px solid #d4a8b0;
-      padding-left: 1.2rem;
-    }
-    .quote-text {
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: #3d3530;
-      font-style: italic;
-    }
-    .quote-zh {
+    .event-title {
       font-size: 0.88rem;
-      line-height: 1.7;
-      color: #6b5a55;
-      margin-top: 0.5rem;
+      line-height: 1.6;
+      color: #2C2318;
+      font-weight: 300;
     }
-    .quote-source {
+    .free-text {
+      font-size: 0.85rem;
+      color: #A89278;
+      font-style: italic;
+      padding: 0.3rem 0;
+      font-weight: 300;
+    }
+    .mid-divider {
+      text-align: center;
+      margin: 1.6rem 0;
+      color: #C4B5A0;
       font-size: 0.75rem;
-      color: #b09a95;
-      margin-top: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .mid-divider::before,
+    .mid-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #C4B5A0;
+    }
+    .quote-area { text-align: center; }
+    .quote-text {
+      font-size: 0.98rem;
+      line-height: 2;
+      color: #2C2318;
+      font-weight: 400;
       letter-spacing: 0.03em;
     }
+    .quote-zh {
+      font-size: 0.83rem;
+      line-height: 1.9;
+      color: #5A4A38;
+      margin-top: 0.6rem;
+      font-weight: 300;
+    }
+    .quote-source {
+      font-size: 0.6rem;
+      color: #A89278;
+      margin-top: 0.85rem;
+      letter-spacing: 0.06em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+    }
     .quote-reflection {
-      font-size: 0.85rem;
-      color: #8a7570;
-      margin-top: 0.8rem;
-      line-height: 1.6;
+      font-size: 0.78rem;
+      color: #6B7B3A;
+      margin-top: 1.1rem;
+      line-height: 1.85;
+      font-style: italic;
+      font-weight: 400;
+      border-top: 1px dashed #D4C8BC;
+      padding-top: 1rem;
     }
     .footer {
-      margin-top: 2rem;
+      padding: 0.85rem 2.5rem;
+      border-top: 1px solid #BFB0A0;
       text-align: center;
-      font-size: 0.72rem;
-      color: #c8bab5;
+      font-size: 0.55rem;
+      color: #A89278;
+      letter-spacing: 0.15em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      background: #EFE8DF;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="header">
-      <div class="name">Bella's LifeOS</div>
-      <div class="date">2026 年 05 月 13 日</div>
-      <div class="weekday">星期三</div>
+  <div class="page">
+    <div class="rings">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
     </div>
-    <hr class="divider">
-    
-        <div class="section">
-          <h2>📅 今日行程</h2>
-          <ul class="events"><li><span class="time">19:00</span><span class="title">海九社交飯</span></li></ul>
-        </div>
-    <hr class="divider">
-    
-        <div class="section quote-section">
-          <h2>✨ 今日金句</h2>
-          <blockquote>
-            <p class="quote-text">Letting go gives us freedom, and freedom is the only condition for happiness.</p>
-            <p class="quote-zh">放下給予我們自由，而自由是幸福的唯一條件。</p>
-            <p class="quote-source">── 一行禪師《佛陀之心》The Heart of the Buddha's Teaching</p>
-            <p class="quote-reflection">🍺 有時候我們以為緊緊握著什麼才能擁有幸福，其實放手那一刻，心才真正輕鬆下來。</p>
-          </blockquote>
-        </div>
-    <div class="footer">每小時自動更新</div>
+    <div class="cal-header">
+      <div class="month-label">MAY · 2026</div>
+      <div class="day-number">13</div>
+      <div class="weekday-label">星期三</div>
+      <div class="lunar-row">
+        <span class="lunar-date">農曆 三月廿八</span>
+      </div>
+    </div>
+    <svg class="wave-sep" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 10" preserveAspectRatio="none">
+      <path d="M0,5 C23,2 46,8 69,5 C92,2 115,8 138,5 C161,2 184,8 207,5 C230,2 253,8 276,5 C299,2 322,8 345,5 C368,2 391,8 414,5 C437,2 460,8 460,5" stroke="#C4B5A0" stroke-width="1.5" fill="none"/>
+    </svg>
+    <div class="body">
+      <div class="section-label">今日行程</div>
+      <p class="free-text">今日行程空白，好好留白。</p>
+      <div class="mid-divider">✦</div>
+      <div class="quote-area">
+        <div class="section-label">今日金句</div>
+        <p class="quote-text">Letting go gives us freedom, and freedom is the only condition for happiness.</p>
+        <p class="quote-zh">放下給予我們自由，而自由是幸福的唯一條件。</p>
+        <p class="quote-source">── 一行禪師《佛陀之心》The Heart of the Buddha's Teaching</p>
+      </div>
+    </div>
+    <div class="footer">BELLA'S LIFEOS · 每小時自動更新</div>
   </div>
 </body>
 </html>

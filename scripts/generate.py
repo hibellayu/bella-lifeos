@@ -7,6 +7,12 @@ import anthropic
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 
+SOLAR_TERMS = {
+    2025: {(1,5):"小寒",(1,20):"大寒",(2,3):"立春",(2,18):"雨水",(3,5):"驚蟄",(3,20):"春分",(4,4):"清明",(4,20):"穀雨",(5,5):"立夏",(5,21):"小滿",(6,5):"芒種",(6,21):"夏至",(7,7):"小暑",(7,22):"大暑",(8,7):"立秋",(8,23):"處暑",(9,7):"白露",(9,23):"秋分",(10,8):"寒露",(10,23):"霜降",(11,7):"立冬",(11,22):"小雪",(12,7):"大雪",(12,21):"冬至"},
+    2026: {(1,5):"小寒",(1,20):"大寒",(2,4):"立春",(2,19):"雨水",(3,5):"驚蟄",(3,20):"春分",(4,4):"清明",(4,20):"穀雨",(5,5):"立夏",(5,21):"小滿",(6,5):"芒種",(6,21):"夏至",(7,7):"小暑",(7,22):"大暑",(8,7):"立秋",(8,23):"處暑",(9,7):"白露",(9,23):"秋分",(10,8):"寒露",(10,23):"霜降",(11,7):"立冬",(11,22):"小雪",(12,7):"大雪",(12,21):"冬至"},
+    2027: {(1,5):"小寒",(1,20):"大寒",(2,3):"立春",(2,18):"雨水",(3,5):"驚蟄",(3,21):"春分",(4,5):"清明",(4,20):"穀雨",(5,5):"立夏",(5,21):"小滿",(6,6):"芒種",(6,21):"夏至",(7,7):"小暑",(7,23):"大暑",(8,7):"立秋",(8,23):"處暑",(9,7):"白露",(9,23):"秋分",(10,8):"寒露",(10,23):"霜降",(11,7):"立冬",(11,22):"小雪",(12,7):"大雪",(12,22):"冬至"},
+}
+
 # 精選語錄庫 50 句：靈性／療癒心理／職涯成長三大主線
 QUOTES = [
     # ── 心經（3）──
@@ -86,7 +92,29 @@ QUOTES = [
     {"text": "Make the best use of what is in your power, and take the rest as it happens.", "zh": "善用你能掌控的，其餘的就順其自然。", "source": "Epictetus《手冊》Enchiridion，第一章"},
     {"text": "It's not what happens to you, but how you react to it that matters.", "zh": "重要的不是發生了什麼，而是你如何回應。", "source": "Epictetus《手冊》Enchiridion，第五章"},
     {"text": "Seek not that the things which happen should happen as you wish; but wish the things which happen to be as they are, and you will have a tranquil flow of life.", "zh": "不要期望事情按你所願發生，而是願意接受事情本來的樣子，你將擁有平靜的人生。", "source": "Epictetus《手冊》Enchiridion，第八章"},
+
+    # ── 做自己的生命設計師（2）──
+    {"text": "我們要從現在的立足點出發，而不是從自己想抵達的地方出發，更不是從自認為該在的地方出發。一定要從腳下的這塊地出發。", "zh": None, "source": "Bill Burnett & Dave Evans《做自己的生命設計師》Designing Your Life"},
+    {"text": "一旦開始設計一件事，那件事就能改變未來。", "zh": None, "source": "Bill Burnett & Dave Evans《做自己的生命設計師》Designing Your Life"},
 ]
+
+
+def get_solar_term(today: datetime.date) -> str:
+    return SOLAR_TERMS.get(today.year, {}).get((today.month, today.day), "")
+
+
+def get_lunar_date(today: datetime.date) -> str:
+    try:
+        from lunardate import LunarDate
+        lunar = LunarDate.fromSolarDate(today.year, today.month, today.day)
+        month_ch = ["正","二","三","四","五","六","七","八","九","十","十一","十二"]
+        day_ch = ["初一","初二","初三","初四","初五","初六","初七","初八","初九","初十",
+                  "十一","十二","十三","十四","十五","十六","十七","十八","十九","二十",
+                  "廿一","廿二","廿三","廿四","廿五","廿六","廿七","廿八","廿九","三十"]
+        leap = "閏" if lunar.isLeapMonth else ""
+        return f"農曆 {leap}{month_ch[lunar.month-1]}月{day_ch[lunar.day-1]}"
+    except Exception:
+        return ""
 
 
 def fetch_calendar_events(ical_url: str, today: datetime.date) -> list[dict]:
@@ -167,27 +195,23 @@ def get_daily_quote(today: datetime.date, api_key: str) -> dict:
     return {**quote, "reflection": reflection}
 
 
-def generate_html(today: datetime.date, events: list[dict], quote: dict) -> str:
+def generate_html(today: datetime.date, events: list[dict], quote: dict,
+                  lunar_date: str = "", solar_term: str = "") -> str:
     date_str = today.strftime("%Y 年 %m 月 %d 日")
     weekdays = ["一", "二", "三", "四", "五", "六", "日"]
     weekday = weekdays[today.weekday()]
+    day_num = today.strftime("%d")
+    month_en = today.strftime("%B").upper()
+    year_num = today.strftime("%Y")
 
     if events:
         items_html = "".join(
-            f'<li><span class="time">{e["time"]}</span><span class="title">{e["summary"]}</span></li>'
+            f'<li><span class="time">{e["time"]}</span><span class="event-title">{e["summary"]}</span></li>'
             for e in events
         )
-        schedule_html = f"""
-        <div class="section">
-          <h2>📅 今日行程</h2>
-          <ul class="events">{items_html}</ul>
-        </div>"""
+        schedule_html = f'<ul class="events">{items_html}</ul>'
     else:
-        schedule_html = """
-        <div class="section free-section">
-          <h2>📅 今日行程</h2>
-          <p class="free-text">今日你很 Free 喔～</p>
-        </div>"""
+        schedule_html = '<p class="free-text">今日行程空白，好好留白。</p>'
 
     q_text = quote["text"]
     q_zh = quote.get("zh") or ""
@@ -195,18 +219,12 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict) -> str:
     q_reflection = quote.get("reflection") or ""
 
     zh_line = f'<p class="quote-zh">{q_zh}</p>' if q_zh else ""
-    reflection_line = f'<p class="quote-reflection">🍺 {q_reflection}</p>' if q_reflection else ""
+    reflection_line = f'<p class="quote-reflection">{q_reflection}</p>' if q_reflection else ""
 
-    quote_html = f"""
-        <div class="section quote-section">
-          <h2>✨ 今日金句</h2>
-          <blockquote>
-            <p class="quote-text">{q_text}</p>
-            {zh_line}
-            <p class="quote-source">── {q_source}</p>
-            {reflection_line}
-          </blockquote>
-        </div>"""
+    lunar_html = ""
+    if lunar_date or solar_term:
+        badge_html = f'<span class="solar-badge">{solar_term}</span>' if solar_term else ""
+        lunar_html = f'<div class="lunar-row"><span class="lunar-date">{lunar_date}</span>{badge_html}</div>'
 
     return f"""<!DOCTYPE html>
 <html lang="zh-Hant">
@@ -215,135 +233,233 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bella's LifeOS｜{date_str}</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&display=swap');
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
-      font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
-      background: #f0ede8;
-      color: #3d3530;
+      font-family: "Noto Serif TC", "Songti TC", "Georgia", serif;
+      background: #E8E0D5;
+      color: #2C2318;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem 1rem;
     }}
-    .card {{
-      background: #fdfaf7;
-      border: 1px solid #e8ddd5;
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      max-width: 600px;
+    .page {{
+      background: #F7F2EA;
+      max-width: 460px;
       width: 100%;
-      box-shadow: 0 4px 24px rgba(180,150,140,0.12);
+      box-shadow: 0 2px 4px rgba(44,35,24,0.08), 0 12px 40px rgba(44,35,24,0.15);
     }}
-    .header {{
-      background: rgba(220, 180, 180, 0.8);
-      border-radius: 20px 20px 0 0;
-      margin: -2.5rem -2rem 2rem -2rem;
-      padding: 2rem 2rem;
+    .rings {{
+      display: flex;
+      justify-content: center;
+      gap: 2.8rem;
+      padding: 0.7rem 0;
+      background: #D4C8BC;
+      border-bottom: 1px solid #BFB0A0;
+    }}
+    .ring {{
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #F7F2EA;
+      border: 2px solid #A89278;
+      box-shadow: inset 0 1px 3px rgba(44,35,24,0.25);
+    }}
+    .cal-header {{
+      padding: 2rem 2.5rem 1.5rem;
       text-align: center;
     }}
-    .header .name {{
-      font-size: 0.78rem;
-      color: #8a6060;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
+    .month-label {{
+      font-size: 0.62rem;
+      letter-spacing: 0.45em;
+      color: #8B3A2A;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
     }}
-    .header .date {{
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #3d2e2e;
+    .day-number {{
+      font-size: 5.5rem;
+      font-weight: 300;
+      color: #2C2318;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.45rem;
     }}
-    .header .weekday {{
-      font-size: 0.9rem;
-      color: #9a7070;
-      margin-top: 0.25rem;
+    .weekday-label {{
+      font-size: 0.68rem;
+      color: #8A7B68;
+      letter-spacing: 0.25em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      margin-bottom: 0.7rem;
     }}
-    .divider {{
-      border: none;
-      border-top: 1px solid #edd5d0;
-      margin: 1.5rem 0;
+    .lunar-row {{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }}
-    .section {{ margin-bottom: 1.5rem; }}
-    .section:last-of-type {{ margin-bottom: 0; }}
-    .section h2 {{
-      font-size: 0.85rem;
-      color: #9dbaa0;
+    .lunar-date {{
+      font-size: 0.62rem;
+      color: #8A7B68;
       letter-spacing: 0.08em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+    }}
+    .solar-badge {{
+      display: inline-block;
+      font-size: 0.58rem;
+      color: #F7F2EA;
+      background: #8B3A2A;
+      padding: 0.1rem 0.5rem;
+      letter-spacing: 0.12em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+    }}
+    .wave-sep {{
+      display: block;
+      width: 100%;
+      height: 10px;
+    }}
+    .body {{
+      padding: 1.6rem 2.5rem 2rem;
+    }}
+    .section-label {{
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      color: #8B3A2A;
+      font-family: -apple-system, "PingFang TC", sans-serif;
       margin-bottom: 1rem;
-      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }}
+    .section-label::after {{
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #C4B5A0;
     }}
     .events {{ list-style: none; }}
     .events li {{
       display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-      padding: 0.7rem 0;
-      border-bottom: 1px solid #f0e5e0;
+      gap: 0.9rem;
+      align-items: baseline;
+      padding: 0.5rem 0;
+      border-bottom: 1px dashed #D4C8BC;
     }}
     .events li:last-child {{ border-bottom: none; }}
     .time {{
-      font-size: 0.78rem;
-      color: #c4938a;
-      min-width: 42px;
-      padding-top: 2px;
+      font-size: 0.68rem;
+      color: #8B3A2A;
+      min-width: 36px;
       font-variant-numeric: tabular-nums;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      flex-shrink: 0;
     }}
-    .title {{ font-size: 0.95rem; line-height: 1.6; color: #3d3530; }}
-    .free-text {{
-      font-size: 1.05rem;
-      color: #c4938a;
-      font-weight: 500;
-      padding: 0.5rem 0;
-    }}
-    .quote-section blockquote {{
-      border-left: 3px solid #d4a8b0;
-      padding-left: 1.2rem;
-    }}
-    .quote-text {{
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: #3d3530;
-      font-style: italic;
-    }}
-    .quote-zh {{
+    .event-title {{
       font-size: 0.88rem;
-      line-height: 1.7;
-      color: #6b5a55;
-      margin-top: 0.5rem;
+      line-height: 1.6;
+      color: #2C2318;
+      font-weight: 300;
     }}
-    .quote-source {{
+    .free-text {{
+      font-size: 0.85rem;
+      color: #A89278;
+      font-style: italic;
+      padding: 0.3rem 0;
+      font-weight: 300;
+    }}
+    .mid-divider {{
+      text-align: center;
+      margin: 1.6rem 0;
+      color: #C4B5A0;
       font-size: 0.75rem;
-      color: #b09a95;
-      margin-top: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }}
+    .mid-divider::before,
+    .mid-divider::after {{
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #C4B5A0;
+    }}
+    .quote-area {{ text-align: center; }}
+    .quote-text {{
+      font-size: 0.98rem;
+      line-height: 2;
+      color: #2C2318;
+      font-weight: 400;
       letter-spacing: 0.03em;
     }}
+    .quote-zh {{
+      font-size: 0.83rem;
+      line-height: 1.9;
+      color: #5A4A38;
+      margin-top: 0.6rem;
+      font-weight: 300;
+    }}
+    .quote-source {{
+      font-size: 0.6rem;
+      color: #A89278;
+      margin-top: 0.85rem;
+      letter-spacing: 0.06em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+    }}
     .quote-reflection {{
-      font-size: 0.85rem;
-      color: #8a7570;
-      margin-top: 0.8rem;
-      line-height: 1.6;
+      font-size: 0.78rem;
+      color: #6B7B3A;
+      margin-top: 1.1rem;
+      line-height: 1.85;
+      font-style: italic;
+      font-weight: 400;
+      border-top: 1px dashed #D4C8BC;
+      padding-top: 1rem;
     }}
     .footer {{
-      margin-top: 2rem;
+      padding: 0.85rem 2.5rem;
+      border-top: 1px solid #BFB0A0;
       text-align: center;
-      font-size: 0.72rem;
-      color: #c8bab5;
+      font-size: 0.55rem;
+      color: #A89278;
+      letter-spacing: 0.15em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+      background: #EFE8DF;
     }}
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="header">
-      <div class="name">Bella's LifeOS</div>
-      <div class="date">{date_str}</div>
-      <div class="weekday">星期{weekday}</div>
+  <div class="page">
+    <div class="rings">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
     </div>
-    <hr class="divider">
-    {schedule_html}
-    <hr class="divider">
-    {quote_html}
-    <div class="footer">每小時自動更新</div>
+    <div class="cal-header">
+      <div class="month-label">{month_en} · {year_num}</div>
+      <div class="day-number">{day_num}</div>
+      <div class="weekday-label">星期{weekday}</div>
+      {lunar_html}
+    </div>
+    <svg class="wave-sep" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 10" preserveAspectRatio="none">
+      <path d="M0,5 C23,2 46,8 69,5 C92,2 115,8 138,5 C161,2 184,8 207,5 C230,2 253,8 276,5 C299,2 322,8 345,5 C368,2 391,8 414,5 C437,2 460,8 460,5" stroke="#C4B5A0" stroke-width="1.5" fill="none"/>
+    </svg>
+    <div class="body">
+      <div class="section-label">今日行程</div>
+      {schedule_html}
+      <div class="mid-divider">✦</div>
+      <div class="quote-area">
+        <div class="section-label">今日金句</div>
+        <p class="quote-text">{q_text}</p>
+        {zh_line}
+        <p class="quote-source">── {q_source}</p>
+        {reflection_line}
+      </div>
+    </div>
+    <div class="footer">BELLA'S LIFEOS · 每小時自動更新</div>
   </div>
 </body>
 </html>"""
@@ -358,8 +474,10 @@ def main():
 
     events = fetch_calendar_events(ical_url, today) if ical_url else []
     quote = get_daily_quote(today, api_key)
+    lunar_date = get_lunar_date(today)
+    solar_term = get_solar_term(today)
 
-    html = generate_html(today, events, quote)
+    html = generate_html(today, events, quote, lunar_date, solar_term)
 
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
