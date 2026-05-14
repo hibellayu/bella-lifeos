@@ -214,8 +214,10 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
         schedule_html = '<p class="free-text">今日行程空白，好好留白。</p>'
 
     q_text = quote["text"]
+    q_zh = quote.get("zh") or ""
     q_question = quote.get("question") or ""
 
+    zh_line = f'<p class="quote-zh">{q_zh}</p>' if q_zh else ""
     explore_line = (
         f'<div class="explore-wrap"><div class="explore-label">今日一問</div>'
         f'<p class="explore-text">{q_question}</p></div>'
@@ -381,6 +383,13 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       font-weight: 400;
       letter-spacing: 0.02em;
     }}
+    .quote-zh {{
+      font-size: 0.83rem;
+      line-height: 1.9;
+      color: #5A4A38;
+      margin-top: 0.6rem;
+      font-weight: 300;
+    }}
     .explore-wrap {{
       margin-top: 1.3rem;
       padding: 0.85rem 1.1rem;
@@ -438,6 +447,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       <div class="quote-area section-gap">
         <div class="section-label">今日金句</div>
         <p class="quote-text">{q_text}</p>
+        {zh_line}
         {explore_line}
       </div>
     </div>
