@@ -170,28 +170,11 @@ def get_daily_quote(today: datetime.date, api_key: str) -> dict:
     random.seed(today.toordinal())
     quote = random.choice(QUOTES)
 
-    reflection = ""
     question = ""
     if api_key:
         client = anthropic.Anthropic(api_key=api_key)
         text = quote["text"]
         source = quote["source"]
-        try:
-            msg = client.messages.create(
-                model="claude-haiku-4-5-20251001",
-                max_tokens=120,
-                messages=[{
-                    "role": "user",
-                    "content": (
-                        f"這句話：「{text}」（出自 {source}）\n"
-                        "請用繁體中文寫一句 25 字以內的短句反思，語氣輕鬆像朋友分享心得，"
-                        "不要重複引文內容，直接輸出反思句子，不要任何前綴標籤。"
-                    ),
-                }],
-            )
-            reflection = msg.content[0].text.strip()
-        except Exception as e:
-            print(f"Claude API error (reflection): {e}")
         try:
             msg = client.messages.create(
                 model="claude-haiku-4-5-20251001",
@@ -209,7 +192,7 @@ def get_daily_quote(today: datetime.date, api_key: str) -> dict:
         except Exception as e:
             print(f"Claude API error (question): {e}")
 
-    return {**quote, "reflection": reflection, "question": question}
+    return {**quote, "question": question}
 
 
 def generate_html(today: datetime.date, events: list[dict], quote: dict,
@@ -231,13 +214,8 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
         schedule_html = '<p class="free-text">今日行程空白，好好留白。</p>'
 
     q_text = quote["text"]
-    q_zh = quote.get("zh") or ""
-    q_source = quote["source"]
-    q_reflection = quote.get("reflection") or ""
     q_question = quote.get("question") or ""
 
-    zh_line = f'<p class="quote-zh">{q_zh}</p>' if q_zh else ""
-    reflection_line = f'<p class="quote-reflection">{q_reflection}</p>' if q_reflection else ""
     explore_line = (
         f'<div class="explore-wrap"><div class="explore-label">今日一問</div>'
         f'<p class="explore-text">{q_question}</p></div>'
@@ -403,30 +381,6 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       font-weight: 400;
       letter-spacing: 0.02em;
     }}
-    .quote-zh {{
-      font-size: 0.83rem;
-      line-height: 1.9;
-      color: #5A4A38;
-      margin-top: 0.6rem;
-      font-weight: 300;
-    }}
-    .quote-source {{
-      font-size: 0.6rem;
-      color: #A89278;
-      margin-top: 0.85rem;
-      letter-spacing: 0.06em;
-      font-family: -apple-system, "PingFang TC", sans-serif;
-    }}
-    .quote-reflection {{
-      font-size: 0.78rem;
-      color: #6B7B3A;
-      margin-top: 1.1rem;
-      line-height: 1.85;
-      font-style: italic;
-      font-weight: 400;
-      border-top: 1px dashed #D4C8BC;
-      padding-top: 1rem;
-    }}
     .explore-wrap {{
       margin-top: 1.3rem;
       padding: 0.85rem 1.1rem;
@@ -484,9 +438,6 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       <div class="quote-area section-gap">
         <div class="section-label">今日金句</div>
         <p class="quote-text">{q_text}</p>
-        {zh_line}
-        <p class="quote-source">── {q_source}</p>
-        {reflection_line}
         {explore_line}
       </div>
     </div>
