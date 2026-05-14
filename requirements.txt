@@ -1,3 +1,4 @@
 anthropic
 icalendar
 lunardate
+recurring-ical-events

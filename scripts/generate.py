@@ -120,50 +120,40 @@ def get_lunar_date(today: datetime.date) -> str:
 def fetch_calendar_events(ical_url: str, today: datetime.date) -> list[dict]:
     try:
         with urllib.request.urlopen(ical_url, timeout=10) as resp:
-            raw = resp.read().decode("utf-8")
+            raw = resp.read()
     except Exception as e:
         print(f"Failed to fetch calendar: {e}")
         return []
 
-    events = []
-    in_event = False
-    current: dict = {}
+    try:
+        import recurring_ical_events
+        from icalendar import Calendar
 
-    for line in raw.splitlines():
-        line = line.strip()
-        if line == "BEGIN:VEVENT":
-            in_event = True
-            current = {}
-        elif line == "END:VEVENT" and in_event:
-            in_event = False
-            start = current.get("DTSTART", "")
-            if start:
-                try:
-                    if "T" in start:
-                        if start.endswith("Z"):
-                            dt = datetime.datetime.strptime(start[:15], "%Y%m%dT%H%M%S")
-                            dt = dt.replace(tzinfo=datetime.timezone.utc).astimezone(TAIPEI)
-                        else:
-                            dt = datetime.datetime.strptime(start[:15], "%Y%m%dT%H%M%S")
-                        event_date = dt.date()
-                        time_str = dt.strftime("%H:%M")
-                    else:
-                        event_date = datetime.date(int(start[:4]), int(start[4:6]), int(start[6:8]))
-                        time_str = "全天"
-                    if event_date == today:
-                        events.append({
-                            "summary": current.get("SUMMARY", "（無標題）"),
-                            "time": time_str,
-                        })
-                except Exception:
-                    pass
-        elif in_event and ":" in line:
-            key, _, val = line.partition(":")
-            key = key.split(";")[0]
-            current[key] = val
+        cal = Calendar.from_ical(raw)
+        day_start = datetime.datetime(today.year, today.month, today.day, 0, 0, 0, tzinfo=TAIPEI)
+        day_end = datetime.datetime(today.year, today.month, today.day, 23, 59, 59, tzinfo=TAIPEI)
+        occurrences = recurring_ical_events.of(cal).between(day_start, day_end)
 
-    events.sort(key=lambda e: e["time"] if e["time"] != "全天" else "00:00")
-    return events
+        events = []
+        for comp in occurrences:
+            dtstart = comp.get("DTSTART")
+            if not dtstart:
+                continue
+            dt = dtstart.dt
+            if hasattr(dt, "hour"):
+                if dt.tzinfo:
+                    dt = dt.astimezone(TAIPEI)
+                time_str = dt.strftime("%H:%M")
+            else:
+                time_str = "全天"
+            summary = str(comp.get("SUMMARY", "（無標題）"))
+            events.append({"summary": summary, "time": time_str})
+
+        events.sort(key=lambda e: e["time"] if e["time"] != "全天" else "00:00")
+        return events
+    except Exception as e:
+        print(f"Error parsing calendar: {e}")
+        return []
 
 
 def get_daily_quote(today: datetime.date, api_key: str) -> dict:
