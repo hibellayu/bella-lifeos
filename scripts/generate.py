@@ -215,6 +215,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
 
     q_text = quote["text"]
     q_zh = quote.get("zh") or ""
+    q_source = quote["source"]
     q_question = quote.get("question") or ""
 
     zh_line = f'<p class="quote-zh">{q_zh}</p>' if q_zh else ""
@@ -383,6 +384,13 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       font-weight: 400;
       letter-spacing: 0.02em;
     }}
+    .quote-source {{
+      font-size: 0.6rem;
+      color: #A89278;
+      margin-top: 0.85rem;
+      letter-spacing: 0.06em;
+      font-family: -apple-system, "PingFang TC", sans-serif;
+    }}
     .quote-zh {{
       font-size: 0.83rem;
       line-height: 1.9;
@@ -448,6 +456,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
         <div class="section-label">今日金句</div>
         <p class="quote-text">{q_text}</p>
         {zh_line}
+        <p class="quote-source">── {q_source}</p>
         {explore_line}
       </div>
     </div>
