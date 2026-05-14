@@ -338,9 +338,7 @@ def generate_html(today: datetime.date, events: list[dict], quote: dict,
       gap: 0.9rem;
       align-items: baseline;
       padding: 0.5rem 0;
-      border-bottom: 1px dashed #D4C8BC;
     }}
-    .events li:last-child {{ border-bottom: none; }}
     .time {{
       font-size: 0.68rem;
       color: #8B3A2A;
